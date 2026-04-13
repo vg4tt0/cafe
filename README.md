@@ -20,13 +20,6 @@ Runs automatically at **8am, 4pm, and midnight** (Sydney time) via Google Cloud 
 
 ---
 
-## Performance
-
-- Calendly fetch: ~4.5 minutes (async, up to 8 concurrent requests, rate-limited to 490 req/min)
-- Freshsales upsert: ~2 minutes (up to 8 concurrent bulk upsert jobs, each polled until `SUCCESS`)
-
----
-
 ## Infrastructure
 
 Runs on **Google Cloud Run Jobs** inside a private project in the `australia-southeast1` region. API tokens are stored in **Google Secret Manager**.
