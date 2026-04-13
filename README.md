@@ -1,7 +1,5 @@
 # CAFE — Calendly → Freshworks Sync
 
-Runs three times a day and keeps Freshsales CRM up to date with each client's next upcoming Calendly appointment.
-
 **Performance:** Processes 80,000+ appointments in ~8 minutes (4.5 min Calendly fetch + ~2 min Freshsales upsert).
 
 ---
