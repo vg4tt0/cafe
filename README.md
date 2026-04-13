@@ -20,13 +20,6 @@ Runs automatically at **8am, 4pm, and midnight** (Sydney time) via Google Cloud 
 
 ---
 
-## Excluded appointment types
-
-- Clean Slate intro call
-- 1-2-1 with Velvet
-
----
-
 ## Performance
 
 - Calendly fetch: ~4.5 minutes (async, up to 8 concurrent requests, rate-limited to 490 req/min)
