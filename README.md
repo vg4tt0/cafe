@@ -1,6 +1,6 @@
 # CAFE — Calendly → Freshworks Sync
 
-**Performance:** Processes 80,000+ appointments in ~8 minutes (4.5 min Calendly fetch + ~2 min Freshsales upsert).
+**Performance:** Processes 8,000+ appointments in ~8 minutes (4.5 min Calendly fetch + ~2 min Freshsales upsert).
 
 ---
 
