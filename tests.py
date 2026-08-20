@@ -9,6 +9,7 @@ from unittest.mock import patch, AsyncMock
 os.environ.setdefault("FRESHSALES_DOMAIN", "test")
 os.environ.setdefault("FRESHSALES_API_KEY", "test")
 os.environ.setdefault("CALENDLY_TOKEN", "test")
+os.environ.setdefault("CALENDLY_ORG", "test")
 
 from main import (
     contact_emails,
@@ -116,12 +117,38 @@ def test_fetch_events_retries_on_429():
         assert result == []
     asyncio.run(run())
 
-def test_fetch_events_raises_on_error():
+def test_fetch_events_retries_on_read_timeout(capsys):
+    call_count = {"n": 0}
+    def handler(req):
+        call_count["n"] += 1
+        if call_count["n"] < 3:
+            raise httpx.ReadTimeout("timed out", request=req)
+        return httpx.Response(200, json={"collection": []})
     async def run():
-        transport = httpx.MockTransport(lambda req: httpx.Response(500))
-        async with httpx.AsyncClient(transport=transport) as client:
-            with pytest.raises(httpx.HTTPStatusError):
-                await fetch_events("test@example.com", client)
+        with patch("main.asyncio.sleep", new_callable=AsyncMock) as sleep:
+            async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+                result = await fetch_events("test@example.com", client)
+        assert call_count["n"] == 3
+        assert sleep.await_count == 2
+        assert result == []
+    asyncio.run(run())
+    output = capsys.readouterr().out
+    assert "Calendly timeout:" in output
+    assert "request=" in output
+    assert "email_ref=" in output
+
+def test_fetch_events_raises_on_error():
+    call_count = {"n": 0}
+    def handler(req):
+        call_count["n"] += 1
+        return httpx.Response(500)
+    async def run():
+        transport = httpx.MockTransport(handler)
+        with patch("main.asyncio.sleep", new_callable=AsyncMock):
+            async with httpx.AsyncClient(transport=transport) as client:
+                with pytest.raises(httpx.HTTPStatusError):
+                    await fetch_events("test@example.com", client)
+        assert call_count["n"] == 5
     asyncio.run(run())
 
 
